@@ -16,6 +16,10 @@ public class Member {
     @NotEmpty
     private String password;
 
+    public Member() {
+
+    }
+
     public Member(String loginId, String name, String password) {
         this.loginId = loginId;
         this.name = name;
