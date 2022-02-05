@@ -45,7 +45,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String homeLoginV2(HttpServletRequest request, Model model) {
-
+        //sessionManager에 저장된 회원 정보 조회
         Member sessionMember = (Member)sessionManager.getSession(request);
 
         if(sessionMember == null) {
