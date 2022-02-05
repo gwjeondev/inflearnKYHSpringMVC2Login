@@ -86,19 +86,22 @@ public class LoginController {
 
         //로그인 성공 처리
         //세션이 있으면 있는 세션 반환, 없으면 신규 세션을 생성
-/*        세션의 create 옵션에 대해 알아보자.
-                request.getSession(true)
-        세션이 있으면 기존 세션을 반환한다.
-                세션이 없으면 새로운 세션을 생성해서 반환한다.
-                request.getSession(false)
-        세션이 있으면 기존 세션을 반환한다.
-                세션이 없으면 새로운 세션을 생성하지 않는다. null 을 반환한다.
+        /* 세션의 create 옵션에 대해 알아보자.
+            - request.getSession(true)
+                1. 세션이 있으면 기존 세션을 반환한다.
+                2. 세션이 없으면 새로운 세션을 생성해서 반환한다.
+            - request.getSession(false)
+                1. 세션이 있으면 기존 세션을 반환한다.
+                2. 세션이 없으면 새로운 세션을 생성하지 않는다. null 을 반환한다.
         request.getSession() : 신규 세션을 생성하는 request.getSession(true) 와 동일하다 */
         HttpSession session = request.getSession();
         //세션에 로그인 회원 정보 보관
+        //SessionConst.LOGIN_MEMBER == "loginMember"가 key가 되고, value로는 loginMember를 session에 저장.
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
         return "redirect:/";
     }
+
+
 
     //@PostMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
