@@ -2,6 +2,7 @@ package hello.login.web.login;
 
 import hello.login.domain.login.LoginService;
 import hello.login.domain.member.Member;
+import hello.login.web.SessionConst;
 import hello.login.web.login.form.LoginForm;
 import hello.login.web.session.SessionManager;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Slf4j
 @Controller
@@ -50,7 +52,7 @@ public class LoginController {
         return "redirect:/";
     }
 
-    @PostMapping("/login")
+    //@PostMapping("/login")
     public String loginV2(@Validated @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletResponse response) {
         if(bindingResult.hasErrors()) {
             log.info("errors = {}", bindingResult);
@@ -69,6 +71,35 @@ public class LoginController {
         return "redirect:/";
     }
 
+    @PostMapping("/login")
+    public String loginV3(@Validated @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request) {
+        if(bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "login/loginForm";
+        }
+
+        Member loginMember = loginService.login(loginForm.getLoginId(), loginForm.getPassword());
+        if(loginMember == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+            return "login/loginForm";
+        }
+
+        //로그인 성공 처리
+        //세션이 있으면 있는 세션 반환, 없으면 신규 세션을 생성
+/*        세션의 create 옵션에 대해 알아보자.
+                request.getSession(true)
+        세션이 있으면 기존 세션을 반환한다.
+                세션이 없으면 새로운 세션을 생성해서 반환한다.
+                request.getSession(false)
+        세션이 있으면 기존 세션을 반환한다.
+                세션이 없으면 새로운 세션을 생성하지 않는다. null 을 반환한다.
+        request.getSession() : 신규 세션을 생성하는 request.getSession(true) 와 동일하다 */
+        HttpSession session = request.getSession();
+        //세션에 로그인 회원 정보 보관
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+        return "redirect:/";
+    }
+
     //@PostMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         //쿠키만료처리 method 호출
@@ -76,11 +107,22 @@ public class LoginController {
         return "redirect:/";
     }
 
-    @PostMapping("/logout")
+    //@PostMapping("/logout")
     public String logoutV2(HttpServletRequest request) {
         //쿠키만료처리 method 호출
         //세션 store에서 삭제한다.
         sessionManager.expire(request);
+        return "redirect:/";
+    }
+
+    @PostMapping("/logout")
+    public String logoutV3(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if(session != null) {
+            //세션 무효화, 삭제
+            session.invalidate();
+        }
+
         return "redirect:/";
     }
 
