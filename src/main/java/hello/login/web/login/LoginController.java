@@ -3,6 +3,7 @@ package hello.login.web.login;
 import hello.login.domain.login.LoginService;
 import hello.login.domain.member.Member;
 import hello.login.web.login.form.LoginForm;
+import hello.login.web.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
@@ -20,13 +22,15 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginController {
 
     private final LoginService loginService;
+    private final SessionManager sessionManager;
+
 
     @GetMapping("/login")
     public String loginForm(@ModelAttribute LoginForm loginForm) {
         return "login/loginForm";
     }
 
-    @PostMapping("/login")
+    //@PostMapping("/login")
     public String login(@Validated @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletResponse response) {
         if(bindingResult.hasErrors()) {
             log.info("errors = {}", bindingResult);
@@ -46,10 +50,37 @@ public class LoginController {
         return "redirect:/";
     }
 
-    @PostMapping("/logout")
-    public String logout(HttpServletResponse response) {
+    @PostMapping("/login")
+    public String loginV2(@Validated @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletResponse response) {
+        if(bindingResult.hasErrors()) {
+            log.info("errors = {}", bindingResult);
+            return "login/loginForm";
+        }
+
+        Member loginMember = loginService.login(loginForm.getLoginId(), loginForm.getPassword());
+        if(loginMember == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+            return "login/loginForm";
+        }
+
+        //로그인 성공 처리
+        //sessionManager를 통해 세션을 생성하고, 회원 데이터 보관.
+        sessionManager.createSession(loginMember, response);
+        return "redirect:/";
+    }
+
+    //@PostMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
         //쿠키만료처리 method 호출
         expireCookie(response, "memberId");
+        return "redirect:/";
+    }
+
+    @PostMapping("/logout")
+    public String logoutV2(HttpServletRequest request) {
+        //쿠키만료처리 method 호출
+        //세션 store에서 삭제한다.
+        sessionManager.expire(request);
         return "redirect:/";
     }
 
