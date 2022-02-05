@@ -30,6 +30,6 @@ class SessionManagerTest {
         sessionManager.expire(request);
         //세션 조회
         Object result1 = sessionManager.getSession(request);
-        assertThat(result1).isSameAs(null);
+        assertThat(result1).isNull();
     }
 }
