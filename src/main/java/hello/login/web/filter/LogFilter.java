@@ -6,6 +6,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.UUID;
+import org.slf4j.MDC;
 
 @Slf4j
 public class LogFilter implements Filter {
@@ -23,10 +24,12 @@ public class LogFilter implements Filter {
         String requestURI = httpRequest.getRequestURI();
 
         String uuid = UUID.randomUUID().toString();
+        MDC.put("uuid",uuid);
 
         try {
             log.info("REQUEST [{}][{}]", uuid, requestURI);
             //chain.doFilter를 통해 다음 Filter를 호출하고, 다음 Filter가 없을 경우 Servlet을 호출한다.
+            //Filter Chain 흐름: 1번 필터 -> 1번 필터 컨트롤러 실행 -> 2번 필터 -> 2번 필터 컨트롤러 실행 -> 2번 필터 종료 -> 1번 필터 종료
             chain.doFilter(request, response);
         }
         catch (Exception e) {
