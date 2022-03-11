@@ -2,6 +2,7 @@ package hello.login.web;
 
 import hello.login.domain.member.Member;
 import hello.login.domain.member.MemberRepository;
+import hello.login.web.argumentresolver.Login;
 import hello.login.web.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -97,8 +98,21 @@ public class HomeController {
             3. Member 타입으로 casting 되어 loginMember 변수에 저장된다. --> Member loginMember
             4. 만약 session에 값이 없을 경우 null이 return 된다.
      */
-    @GetMapping("/")
+    //@GetMapping("/")
     public String homeLoginV4(@SessionAttribute(name=SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model) {
+
+        //세션에 회원 데이터가 없으면 home
+        if(loginMember == null) {
+            return "home";
+        }
+
+        //세션이 유지되면 로그인 성공
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+
+    @GetMapping("/")
+    public String homeLoginV5(@Login Member loginMember, Model model) {
 
         //세션에 회원 데이터가 없으면 home
         if(loginMember == null) {
