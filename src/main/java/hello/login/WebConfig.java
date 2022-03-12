@@ -40,8 +40,6 @@ public class WebConfig implements WebMvcConfigurer {
                         "/css/**", "/*.ico", "/error");
     }
 
-
-
     //filter 등록
     //@Bean
     public FilterRegistrationBean logFilter() {
@@ -52,6 +50,19 @@ public class WebConfig implements WebMvcConfigurer {
 
         return filterRegistrationBean;
     }
+
+    //loginCheckFilter를 @Component사용해서 Bean으로 등록한 상태에서 Filter 등록하기
+    //@Autowired private LoginCheckFilter loginCheckFilter;
+    //filter 등록
+    //@Bean
+/*    public FilterRegistrationBean loginCheckFilter() {
+        FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(loginCheckFilter); //filter 추가
+        filterRegistrationBean.setOrder(2); //filter chain 순서 지정
+        filterRegistrationBean.addUrlPatterns("/*"); //filter 처리 할 url patterns
+
+        return filterRegistrationBean;
+    }*/
 
     //filter 등록
     //@Bean

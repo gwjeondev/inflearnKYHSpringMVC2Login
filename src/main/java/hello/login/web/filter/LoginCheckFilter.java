@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Slf4j
+//@Component //loginCheckFilter를 Spring Bean으로 등록하기(@Autowired 의존관계 주입을 받기 위해서) 등록법은 WebConfig 참고
 public class LoginCheckFilter implements Filter {
 
     private static final String[] whitelist = {"/", "/members/add", "/login", "/logout", "/css/*"};
