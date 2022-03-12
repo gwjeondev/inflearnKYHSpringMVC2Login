@@ -5,6 +5,7 @@ import hello.login.web.filter.LogFilter;
 import hello.login.web.filter.LoginCheckFilter;
 import hello.login.web.interceptor.LogInterceptor;
 import hello.login.web.interceptor.LoginCheckInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,11 +34,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**") //서블릿 filter와 pattern이 조금 다르다.
                 .excludePathPatterns("/css/**", "/*.ico", "/error"); //예외 path pattern
 
-        registry.addInterceptor(new LoginCheckInterceptor())
+/*        registry.addInterceptor(new LoginCheckInterceptor())
                 .order(2)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/", "/members/add", "/login", "/logout",
-                        "/css/**", "/*.ico", "/error");
+                        "/css/**", "/*.ico", "/error");*/
     }
 
     //filter 등록
@@ -52,27 +53,31 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     //loginCheckFilter를 @Component사용해서 Bean으로 등록한 상태에서 Filter 등록하기
-    //@Autowired private LoginCheckFilter loginCheckFilter;
+    private final LoginCheckFilter loginCheckFilter;
+    @Autowired
+    public WebConfig(LoginCheckFilter loginCheckFilter) {
+        this.loginCheckFilter = loginCheckFilter;
+    }
     //filter 등록
-    //@Bean
-/*    public FilterRegistrationBean loginCheckFilter() {
+    @Bean
+    public FilterRegistrationBean loginCheckFilterBean() {
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(loginCheckFilter); //filter 추가
-        filterRegistrationBean.setOrder(2); //filter chain 순서 지정
+        filterRegistrationBean.setOrder(1); //filter chain 순서 지정
         filterRegistrationBean.addUrlPatterns("/*"); //filter 처리 할 url patterns
 
         return filterRegistrationBean;
-    }*/
+    }
 
     //filter 등록
     //@Bean
-    public FilterRegistrationBean loginCheckFilter() {
+  /*  public FilterRegistrationBean loginCheckFilter() {
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new LoginCheckFilter()); //filter 추가
         filterRegistrationBean.setOrder(2); //filter chain 순서 지정
         filterRegistrationBean.addUrlPatterns("/*"); //filter 처리 할 url patterns
 
         return filterRegistrationBean;
-    }
+    }*/
 
 }
